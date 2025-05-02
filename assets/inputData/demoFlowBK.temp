@@ -1,0 +1,502 @@
+import { _decorator,JsonAsset,resources,error,Component,Node,Vec3, math, Enum, Prefab, tween, Animation, UITransform, UIOpacity, Vec2, Button, EventHandler, input, Input, EventKeyboard, KeyCode, Sprite } from 'cc';
+import { demoInfo_TA } from './demoInfo_TA';
+import { reelRun_TA } from './reelRun_TA';
+import { symSetting_TA } from './symSetting_TA';
+
+import { symResource_TA } from './symResource_TA';
+//import { readFileSync } from 'fs-extra';
+import {} from '../../../../inputData/dataStructure';
+import {convertLineAwardData,convertLineAwardDataB,requestJsonData,convertInitialSymData,convertSymCordData_initial} from '../../../../inputData/dataOperate';
+import {assetData} from '../../../../inputData/asset_data';
+
+import { uiController_TA } from './uiController_TA';
+
+import {clearReelFloor,startGameReelRun,drop_symbolsB,adjustReelSizeB,buildFloorGridB,buildReelSymB,getReelRunSymArray} from '../../../../reelOp/reelOperate';
+import {dropSymbolInternal,floorShadowSeting,checkFloorSym,showLinkSym,} from '../../../../reelOp/symOperate';
+
+
+//@ts-ignore。忽略單行報錯  
+
+//import assetData from '../../../../inputData/asset_data.json';
+
+//@ts-ignore。忽略單行報錯  
+
+//import gameSimData from '../../../../inputData/play.json';
+
+//@ts-ignore。忽略單行報錯  
+
+//import gameInitialData from '../../../../inputData/play_init.json';
+//import {reelDataInput} from '../../../../inputData/dataOperate';
+
+//import  {reelData} from '../../../../inputData/assets_structures.json';
+
+
+//@ts-ignore。忽略單行報錯 
+
+const { ccclass, property } = _decorator;
+
+
+
+@ccclass('demoFlow_TA')
+export class demoFlow_TA extends Component {
+    
+    public gameRound: number = 0;//紀錄遊戲目前demo第幾局(第0局開始)
+    
+    public gameSeed: number = null//0;//紀錄遊戲目前產生資浪局數亂數)
+
+    public gameRoundCount:number = null //模擬資料中總局數
+    public stepRound: number = 0;//紀錄目前demo第幾回合(第0回合開始)
+
+    //public gameFootageFromJson:boolean = false
+
+    private eventNameID = {  //每局結算完需執行的事件
+        'sceneLevelUp': 0,
+    };
+
+    public gameInitialSimData:any = null// gameInitialData.data
+
+    public gameSimData:any = null //gameSimData.data //全部模擬資料
+
+
+    public gameSimDataKey:string = null
+
+    public fixTestData:boolean = true
+
+    public assetData:any  = assetData//null //assetData.reelTimer
+
+    public reelTimer:any  = assetData.reelTimer
+    public dt_preColumn_symIn:number = assetData.reelTimer.dt_preColumn_symIn
+    public dt_preColumn_symClean:number = assetData.reelTimer.dt_preColumn_symClean
+    public dt_preSymbol:number = assetData.reelTimer.dt_preSymbol
+    
+    public selSimDataBuffer:any = null // 亂數選定局數資料
+    public secFloorSymbolData:any = null
+    public divAllRoundData:any = null // 全部局數與回數資料
+    public selSimDataJsonID:any = null // 全部局數與回數資料
+
+    public rowAndColumn:any = assetData.rowAndColumn // 全部局數與回數資料
+    public gridLevel:any =  assetData.gridLevel // 全部局數與回數資料
+    public symLayerSize:any = assetData.symLayerSize // 全部局數與回數資料
+    public symbolData:any = assetData.symbolData // 全部局數與回數資料
+    public reelData:any = assetData.reelData // 全部局數與回數資料
+    public UI:any = assetData.UI // 全部局數與回數資料
+    public chaTimer:any = assetData.chaTimer // 全部局數與回數資料
+
+    public autoRunCount:number = 0 // 全部局數與回數資料
+    
+    public isInitialRound:boolean = null // is initial Round
+
+    public autoRunMaxCount:number =100
+
+    public isAutoRun:boolean =false
+
+
+    /* 腳本連結 */
+    @property({ type: reelRun_TA, tooltip: "軸面功能腳本" })
+    public reelRunTA: reelRun_TA = null;
+
+
+    @property({ type: demoInfo_TA, tooltip: "demo內容腳本" })
+    public demoInfoTA: demoInfo_TA = null;
+
+    @property({ type: symResource_TA, tooltip: "素材庫腳本" })
+    private symResourcTA: symResource_TA = null;
+
+
+    @property({ type: uiController_TA, tooltip: "UI控制腳本" })
+    private uiControllerTA: uiController_TA = null;
+
+
+    //console.log('getJsonData_______________3',assetJson)
+
+
+
+    onLoad(){
+      
+
+        //按鈕觸發設置
+        const thisScriptName = this.name.split('<')[1].split('>')[0];  //取得自身腳本的名稱，從'<'分割，保留第2部分，再從'>'分割，保留第1部分 //'demoFlow_TA'
+        //spin按鈕，設置呼叫的涵式
+        const spinBtnEventHandler = new EventHandler();  //新增一個按鈕ClickEvents
+        spinBtnEventHandler.target = this.node;          //指定要執行的節點
+        spinBtnEventHandler.component = thisScriptName;  //執行的腳本名稱
+        spinBtnEventHandler.handler = 'clickSpin';       //執行的Funtion名稱
+        this.symResourcTA.btnSpin.getComponent(Button).clickEvents.push(spinBtnEventHandler);  //指定按鈕節點，push()內填入前面宣告的名稱
+
+        const autoBtnEventHandler = new EventHandler();  //新增一個按鈕ClickEvents
+        autoBtnEventHandler.target = this.node;          //指定要執行的節點
+        autoBtnEventHandler.component = thisScriptName;  //執行的腳本名稱
+        autoBtnEventHandler.handler = 'autoRunSwitch';       //執行的Funtion名稱
+        this.symResourcTA.btnAuto.getComponent(Button).clickEvents.push(autoBtnEventHandler);  //指定按鈕節點，push()內填入前面宣告的名稱
+
+
+        
+        //requestJsonData(this,'','assetData',true,0);
+
+       // requestJsonData(this,'','initData',true,0);
+
+
+
+    };
+    
+
+    start() {
+    
+        this.isAutoRun = false
+
+        //console.log('assetData.ts________234',assetData)
+
+
+        //this.scheduleOnce(()=>{
+
+
+          
+
+            //createiInitialGrid(this,-1)
+
+
+            //createFloorGrid(this.reelRunTA, 0) //生成地板格
+
+            //createReelSym(this.reelRunTA,this.gameRound,0,false) //預生成盤面上的符號
+            
+            //drop_symbols(this.reelRunTA, 'reelIn',this.dt_preColumn_symIn,this.dt_preColumn_symClean , this.dt_preSymbol, this.gameRound,"初始盤面")  
+
+        //},1) //遊戲啟動後等0.5秒執行
+        
+    
+        //console.log('this.reelRunTA_______33',this.reelRunTA,this.assetData.catMoveProcessTagKey,this.gameSeed)
+
+        async function runRequestJsonData(object:any,timeout:number){
+
+
+
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    //let data:any = 
+                    let jsonData:any = requestJsonData(this,'','initData',true,0);
+                    //let jsonData:any = requestJsonData(this,'','selPlayData',true,0);
+ 
+                
+                    //console.log(`wait:___________________1 ${timeout}`)          // no Data
+                    //console.log(`wait:___________________2 ${timeout}`,jsonData) //will be Promise(pending)
+
+                    //object.gameInitialSimData = jsonData.data  //will be Promise(pending) 
+
+                    //object.reelRunTA.gameInitialSimData = jsonData.data
+                    resolve(jsonData)
+
+                },timeout*1000)
+
+
+            })
+        
+                
+        }
+        async function initialGameSimReel(object:any){
+
+             
+            let getJsonData:any =  await runRequestJsonData(object,0.2)
+                console.log(`wait___________________44444`,getJsonData)
+            
+                object.gameInitialSimData = getJsonData.data
+                console.log(`wait___________________55555`,object,object.gameInitialSimData)
+                object.isInitialRound = true  //是否為初始盤面
+                //createiInitialGrid(object,object.gameRound)
+
+
+                
+                await adjustReelSizeB(object,object.gameRound,0.1)  
+                await buildFloorGridB(object,object.gameRound,0.1)  
+                let getConvertInitialSymData:any = await convertSymCordData_initial(object.gameInitialSimData,object.gameRound,object.stepRound,0.1)
+                let symArray:any = await getReelRunSymArray(object,0.1)
+
+
+                await buildReelSymB(object,symArray,getConvertInitialSymData,symSetting_TA,object.gameRound, object.stepRound, false,'initialReel',0.1)//object  reelRun_TA.ts
+
+                await drop_symbolsB(object, 'reelIn', object.gameRound,"初始盤面",0.1)  //object  reelRun_TA.ts
+
+
+        };
+
+
+        initialGameSimReel(this)
+        //console.log(`wait:___________________6`,this)
+
+        
+    };
+
+    /* 開始spin轉動 */
+    clickSpin() {
+        
+        //requestJsonData(this,'/cocos/catRaider/play_1000.json','selPlayData',true,602);
+
+        this.isInitialRound = false  //是否為初始盤面
+
+
+        async function runRequestJsonData(object:any,timeout:number){     //取得單局模擬資料
+
+
+
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    //let data:any = 
+                    let jsonData:any = requestJsonData(this,'/cocos/catRaider/play_1000.json','selPlayData',true,3);  //602 test 15
+
+                    // 3 能量球s
+
+                    // 4 升級
+
+                    //102 bonus
+
+                    //新版14
+                
+                    resolve(jsonData)
+
+
+                },timeout*1000)
+
+
+            })
+        
+                
+        };
+
+
+        async function getConvertLineAwardData(object:any,timeout:number){     //取得單局模擬資料
+
+
+
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    //let data:any = 
+                    
+                    let allLineAwardData:any = convertLineAwardData(object)
+                    //let allLineAwardData:any = convertLineAwardDataB(object)
+
+                
+                    resolve(allLineAwardData)
+     
+
+                },timeout*1000)
+
+
+            })
+        
+                
+        };
+
+        async function getConvertLineAwardDataB(object:any,timeout:number){     //取得單局模擬資料 //test convert
+
+
+
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    //let data:any = 
+                    
+
+                    convertLineAwardDataB(object)
+                
+                    resolve('')
+     
+
+                },timeout*1000)
+
+
+            })
+        
+                
+        }
+
+
+
+
+        async function runSpin(object:any){
+
+
+            
+
+            if( object.reelRunTA.sceneLevel != 0){
+                //let symArray:any = await getReelRunSymArray(object,0.5)
+
+                await drop_symbolsB(object, 'reelClean', object.gameRound,"4",0.5)  //符號調出盤面
+                //await reelSizeReset(object,5,0.2)
+                await clearReelFloor(object)
+
+                //await clearFloorSym(object,0.2)   //清除地板（第二層）符號
+                object.reelRunTA.reelSizeTA.ResetReelSize(); //呼叫重置盤面尺寸涵式(復原底層格)
+
+                //object.gameRound = 0
+                //object.stepRound = 0
+                //object.gameRoundCount = 0
+                //object.reelRunTA.sceneLevel = 0
+
+                //await changeReelSizeB(object,0,0.2)
+                
+                //await waittingTransation(object,object.reelRunTA.sceneLevel,1)//等待地板動畫
+                //adjustReelSizeB(reelRunTA, currentGameRound,0.1)
+                //buildFloorGridB(reelRunTA, currentGameRound,0.2)
+            
+                
+            };
+
+
+
+           
+                //await drop_symbolsB(object, 'reelClean', object.gameRound,"4",0.3)  //符號調出盤面
+
+                //await clearFloorSym(object,0.2)   //清除地板（第二層）符號
+
+
+                let getJsonData:any =  await runRequestJsonData(object,0.5)
+                
+                object.gameSeed = getJsonData[0]
+                object.gameSimData = getJsonData[1]
+                object.selSimDataJsonID = getJsonData[4]
+                console.log(`click_Spin____________00`,getJsonData,"selSimDataJsonID",object.selSimDataJsonID,"gameSimData",object.gameSimData,object.gameSeed)
+            
+                //console.log(`wait:___________________ 8`,object)
+                object.gameRound = 0
+                object.stepRound = 0
+                object.gameRoundCount = 0
+                object.reelRunTA.sceneLevel = 0
+
+            
+                let selSimData:any = object.gameSimData.snapshots
+                object.selSimDataBuffer = selSimData //模擬資料來源
+                console.log('click_Spin____________11',object.gameSeed,object.selSimDataBuffer);
+
+                
+                //let selProcessSimData:any =  object.selSimDataBuffer.filter(e => e.process_tag.idx == 1)[0];
+        
+                //let selSecFloorSymbol:any = selProcessSimData.second_layer
+        
+                //object.secFloorSymbolData = selSecFloorSymbol   // 將第二層符號資料暫存入 
+
+                console.log('click_Spin____________33',object.secFloorSymbolData);
+
+
+
+                let allRoundData:any = await getConvertLineAwardData(object.selSimDataBuffer,0.5)
+
+                await getConvertLineAwardDataB(getJsonData[5],0.5)   //test convert
+                
+                object.divAllRoundData  = allRoundData
+                object.gameRoundCount = allRoundData.length
+
+
+         
+                
+        
+                await startGameReelRun(object,object.gameRound,object.stepRound,"initial",true,0.5)  //reelOperate.startGameReelRun 盤面初始化
+            
+        };
+
+
+      
+
+        runSpin(this)
+        //console.log(`wait:___________________9`,this)
+    };
+
+
+
+
+        
+
+    autoRunSwitch(){
+
+
+        this.autoRunMaxCount = 100 //設定autorun次數
+
+        if(this.isAutoRun == false){
+            this.isAutoRun = true   
+        }else{
+
+            this.isAutoRun = false   
+        }
+        console.log('auto spin__________0000',this.isAutoRun)
+       
+        this.autoRun(this.autoRunCount)
+
+    };
+
+    autoRun(count:number){
+
+        this.isInitialRound = false  
+
+        async function runRequestJsonData(object:any,timeout:number){     //取得單局模擬資料
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let jsonData:any = requestJsonData(this,'/cocos/catRaider/play_1000.json','selPlayData',false,14);  //602 test 14
+                    resolve(jsonData)
+                },timeout*1000)
+            })
+        };
+
+        async function getConvertLineAwardData(object:any,timeout:number){     //取得單局模擬資料
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let allLineAwardData:any = convertLineAwardData(object)              
+                    resolve(allLineAwardData)
+                },timeout*1000)
+            })         
+        };
+        async function runSpin(object:any,timeout:number){
+            let getJsonData:any =  await runRequestJsonData(object,timeout)   
+            object.gameSeed = getJsonData[0]
+            object.gameSimData = getJsonData[1]
+            object.selSimDataJsonID = getJsonData[4]
+
+            console.log(`autoRunSpin______00`,getJsonData,"selSimDataJsonID",object.selSimDataJsonID,"gameSimData",object.gameSimData,'gameSeed',object.gameSeed)
+
+            object.gameRound = 0
+            object.stepRound = 0
+            object.gameRoundCount = 0
+            object.reelRunTA.sceneLevel = 0
+
+        
+            let selSimData:any = object.gameSimData.snapshots
+            object.selSimDataBuffer = selSimData //模擬資料來源
+            console.log('autoRunSpin______11',object.gameSeed,object.selSimDataBuffer);
+
+            
+            let selProcessSimData:any =  object.selSimDataBuffer.filter(e => e.process_tag.idx == 1)[0];
+    
+            let selSecFloorSymbol:any = selProcessSimData.second_layer
+    
+            object.secFloorSymbolData = selSecFloorSymbol   // 將第二層符號資料暫存入 
+
+            console.log('autoRunSpin______22',object.secFloorSymbolData);
+
+
+
+            let allRoundData:any = await getConvertLineAwardData(object.selSimDataBuffer,timeout)
+            object.divAllRoundData  = allRoundData
+            object.gameRoundCount = allRoundData.length
+
+            console.log('autoRunSpin______33',object.divAllRoundData ,object.gameRoundCount,object.isInitialRound)
+            
+    
+    
+            //await reelSizeRestroe(object) 
+
+
+
+
+
+            
+            await startGameReelRun(object,object.gameRound,object.stepRound,"initial",true,0.1)  //reelOperate.startGameReelRun 盤面初始化
+
+        };
+
+
+      
+
+        runSpin(this,0.2)
+
+
+
+
+    };
+    
+};

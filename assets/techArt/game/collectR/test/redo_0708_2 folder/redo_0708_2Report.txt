@@ -1,0 +1,85 @@
+Report created: 
+	2021/7/12	上午 09:50:28
+
+Project name: redo_0708_2.aep
+
+Source files collected to: 
+	G:\叢林歷險\redo_0708_2 folder
+
+Source files collected: All
+
+Collected comps:  
+	redo_ani
+	mb_frame
+	mb_text
+	text
+	export
+	Luma Fire 1.mov (Particular Sprite Primary) Comp 1
+	Luma Fire 1.mov (Particular Sprite S2) Comp 1
+	logo_0706
+	
+Number of collected files:  373
+
+Size of collected files:  477 MB
+
+Collected source files: 
+	\\mcd-one\3d_project\rainforest_v01_cf\QC\rainforest_cf_layoutdemo_v001.mp4
+	\\mcd-one\3d_project\rainforest_v01_cf\QC\rainforest_cf_layoutdemo_v002.mp4
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\demo_all.mp4
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\Particular_Assets\Luma Fire 1.mov
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\bg.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\bg_filter.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\bg_filter_black.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\clip_coin_.0002.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\clip_coin_.0004.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\clip_coin_.0005.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\clip_coin_.0015.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\frame.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\grand.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\grand_compass.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\light.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\shine_a_(screen).png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\shine_b_resize(add).png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\png\shockwave.png
+	Sequence "num_count_[00000-00299].png" at \\mcd-one\3d_project\rainforest_v01_cf\ref\grand_v007 folder\(Footage)\sequence\num_count with 300 files and 0 auxiliary files
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\logo\logo_FIX\logo_6.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\logo\rainforest.png
+	\\mcd-one\3d_project\rainforest_v01_cf\ref\logo\叢林歷險.png
+	\\mcd-one\public\Steve\temp\rainforest\anim\rainforest_cf_anim_v005.mp4
+	\\mcd-one\public\Steve\temp\rainforest\layout\rainforest_cf_layout_v003.mp4
+	G:\叢林歷險\BB_叢林歷險_橫版.png
+	G:\叢林歷險\logo_0706.psd
+	G:\叢林歷險\logo_mask_01.png
+	G:\叢林歷險\logo_mask_02.png
+	Sequence "greenline_0709_[0001-0046].png" at G:\叢林歷險\vLine with 46 files and 0 auxiliary files
+	
+Rendering plug-ins:
+	Classic 3D
+	
+Effects used:  10
+
+Effect:  Bulge
+	
+Effect:  CC Force Motion Blur
+	
+Effect:  Deep Glow
+	
+Effect:  Exposure
+	
+Effect:  Fast Box Blur
+	
+Effect:  Particular
+	
+Effect:  S_LensFlare
+	
+Effect:  S_Shake
+	
+Effect:  Saber
+	
+Effect:  VC Color Vibrance
+	
+
+Layer:  Text Layer
+	External dependencies:  
+		Font family: “HanWang ZonYiHeavy-Gb5”, Font style: “Regular”
+

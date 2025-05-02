@@ -1,0 +1,13 @@
+{
+  "ver": "2.0.3",
+  "importer": "animation-clip",
+  "imported": true,
+  "uuid": "ba4b43e8-cd01-46e0-a6b6-e6b40a38b309",
+  "files": [
+    ".cconb"
+  ],
+  "subMetas": {},
+  "userData": {
+    "name": "floorSym_stage_fadeOut"
+  }
+}
